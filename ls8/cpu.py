@@ -8,17 +8,17 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.memory = [0] * 256
+        self.ram = [0] * 256
         self.registers = [0] * 8
         self.program_counter = 0
-        self.instruction_register = 0
-        self.stack_pointer = 0xF4
+        # self.instruction_register = 0
+        # self.stack_pointer = 0xF4
 
     def ram_read(self, address):
-        return self.memory[address]
+        return self.ram[address]
 
     def ram_write(self, address, value):
-        self.memory[address] = value
+        self.ram[address] = value
 
     def load(self):
         """Load a program into memory."""
@@ -72,6 +72,25 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        self.instruction_register = self.memory[program_counter]
-        operand_1 = self.memory[program_counter + 1]
-        operand_2 = self.memory[program_counter + 2]
+        running = True
+        while running:
+            cmd = self.ram[self.program_counter]
+
+            numa = self.ram[self.program_counter + 1]
+            numb = self.ram[self.program_counter + 2]
+
+            if cmd == 0b00000001:
+                running = False
+                self.program_counter += 1
+
+            elif cmd == 0b10000010:
+                self.registers[numa] = 8
+                self.program_counter += 3
+
+            elif cmd == 0b01000111:
+                print(self.registers[numa])
+                self.program_counter += 2
+
+            else:
+                print('unknown instruction')
+                sys.exit(1)
