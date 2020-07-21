@@ -5,7 +5,7 @@ import sys
 HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
-MUL =
+MUL = 0b10100010
 
 
 class CPU:
@@ -50,6 +50,9 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         # elif op == "SUB": etc
+        elif op == 'MUL':
+            self.reg[reg_a] *= self.reg[reg_b]
+            return self.reg[reg_a]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -92,6 +95,13 @@ class CPU:
             elif cmd == PRN:
                 print(self.reg[operand_a])
                 self.pc += 2
+
+            elif cmd == MUL:
+                MULVAL = self.alu(self, self.reg[operand_a], self.reg[operand_b])
+                print('multiplied value ==>' MULVAL)
+                self.pc += 3
+                self.alu('MUL' operand_a,operand_b)
+                self.pc +=3
 
             else:
                 print('unknown instruction')
