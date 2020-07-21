@@ -2,6 +2,11 @@
 
 import sys
 
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+MUL =
+
 
 class CPU:
     """Main CPU class."""
@@ -9,10 +14,8 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0] * 256
-        self.registers = [0] * 8
-        self.program_counter = 0
-        # self.instruction_register = 0
-        # self.stack_pointer = 0xF4
+        self.reg = [0] * 8
+        self.pc = 0
 
     def ram_read(self, address):
         return self.ram[address]
@@ -74,22 +77,21 @@ class CPU:
         """Run the CPU."""
         running = True
         while running:
-            cmd = self.ram[self.program_counter]
+            self.ram_read(self.pc)
 
-            numa = self.ram[self.program_counter + 1]
-            numb = self.ram[self.program_counter + 2]
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
 
-            if cmd == 0b00000001:
+            if cmd == HLT:
                 running = False
-                self.program_counter += 1
 
-            elif cmd == 0b10000010:
-                self.registers[numa] = 8
-                self.program_counter += 3
+            elif cmd == LDI:
+                self.reg[operand_a] = operand_b
+                self.pc += 3
 
-            elif cmd == 0b01000111:
-                print(self.registers[numa])
-                self.program_counter += 2
+            elif cmd == PRN:
+                print(self.reg[operand_a])
+                self.pc += 2
 
             else:
                 print('unknown instruction')
