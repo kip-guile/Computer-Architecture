@@ -26,23 +26,31 @@ class CPU:
     def load(self):
         """Load a program into memory."""
 
+        program = []
+
         if len(sys.argv) != 2:
-            print(f'usage: {sys.argv[0]} filename')
+            print('must have filename')
             sys.exit(1)
 
         try:
+            address = 0
             with open(sys.argv[1]) as f:
                 for line in f:
-                     num = line.split('#', 1)[0]
-                     if num.strip() == '':
-                         continue
+                    num = line.split('#')[0].strip()
+                    if num == '':
+                        continue
 
-                    self.ram[address] = int(num, 2)
-                    address += 1
-        
+                    # print num
+                    value = int(num, 2)  # ,2
+                    program.append(value)
+
         except FileNotFoundError:
-            print(f'{sys.argv[0]}: {sys.srgb[1]} not found')
+            print(f'{sys.argv[0]}: {sys.argv[1]} not found')
             sys.exit(2)
+
+        for instruction in program:
+            self.ram[address] = instruction
+            address += 1
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -52,7 +60,6 @@ class CPU:
         # elif op == "SUB": etc
         elif op == 'MUL':
             self.reg[reg_a] *= self.reg[reg_b]
-            return self.reg[reg_a]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -80,7 +87,7 @@ class CPU:
         """Run the CPU."""
         running = True
         while running:
-            self.ram_read(self.pc)
+            cmd = self.ram_read(self.pc)
 
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
@@ -97,11 +104,12 @@ class CPU:
                 self.pc += 2
 
             elif cmd == MUL:
-                MULVAL = self.alu(self, self.reg[operand_a], self.reg[operand_b])
-                print('multiplied value ==>' MULVAL)
+                # MULVAL = self.alu(
+                #     self, self.reg[operand_a], self.reg[operand_b])
+                # print('multiplied value ==>', MULVAL)
+                # self.pc += 3
+                self.alu('MUL', operand_a, operand_b)
                 self.pc += 3
-                self.alu('MUL' operand_a,operand_b)
-                self.pc +=3
 
             else:
                 print('unknown instruction')
