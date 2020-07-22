@@ -20,7 +20,7 @@ class CPU:
         self.branchtable = {}
         self.branch_operations()
 
-    def LDI(self, a, b, c):
+    def LDI(self, a, b):
         self.reg[a] = b
         self.pc += 3
 
@@ -36,7 +36,6 @@ class CPU:
         self.branchtable[0b10000010] = self.LDI
         self.branchtable[0b01000111] = self.PRN
         self.branchtable[0b10100010] = self.MUL
-        self.branchtable[0b00000001] = self.HLT
 
     def ram_read(self, address):
         return self.ram[address]
@@ -77,7 +76,6 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        # elif op == "SUB": etc
         elif op == 'MUL':
             self.reg[reg_a] *= self.reg[reg_b]
         else:
@@ -113,28 +111,13 @@ class CPU:
             operand_b = self.ram_read(self.pc + 2)
 
             if cmd == HLT:
+                print('closing run loop')
                 running = False
+                break
 
-            # elif cmd == LDI:
-            #     self.reg[operand_a] = operand_b
-            #     self.pc += 3
-
-            # elif cmd == PRN:
-            #     print(self.reg[operand_a])
-            #     self.pc += 2
-
-            # elif cmd == MUL:
-            #     # MULVAL = self.alu(
-            #     #     self, self.reg[operand_a], self.reg[operand_b])
-            #     # print('multiplied value ==>', MULVAL)
-            #     # self.pc += 3
-            #     self.alu('MUL', operand_a, operand_b)
-            #     self.pc += 3
+            elif cmd not in self.branchtable:
+                print('unknown instruction')
+                sys.exit(1)
 
             else:
-                elif IR not in self.branchtable:
-                    print('unknown instruction')
-                    sys.exit(1)
-
-                else:
-                    self.branchtable[cmd](operand_a, operand_b)
+                self.branchtable[cmd](operand_a, operand_b)
