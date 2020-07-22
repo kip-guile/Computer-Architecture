@@ -7,5 +7,9 @@ from cpu import *
 
 cpu = CPU()
 
-cpu.load()
+if len(sys.argv) != 2:
+    print('must have filename')
+    sys.exit(1)
+
+cpu.load(sys.argv)
 cpu.run()

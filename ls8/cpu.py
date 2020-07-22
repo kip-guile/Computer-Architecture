@@ -17,37 +17,57 @@ class CPU:
         self.reg = [0] * 8
         self.pc = 0
 
+        self.branchtable = {}
+        self.branch_operations()
+
+    def LDI(self, a, b, c):
+        self.reg[a] = b
+        self.pc += 3
+
+    def MUL(self, a, b):
+        self.alu('MUL', a, b)
+        self.pc += 3
+
+    def PRN(self, a, b):
+        print(self.reg[a])
+        self.pc += 2
+
+    def branch_operations(self):
+        self.branchtable[0b10000010] = self.LDI
+        self.branchtable[0b01000111] = self.PRN
+        self.branchtable[0b10100010] = self.MUL
+        self.branchtable[0b00000001] = self.HLT
+
     def ram_read(self, address):
         return self.ram[address]
 
     def ram_write(self, address, value):
         self.ram[address] = value
 
-    def load(self):
+    def load(self, arg):
         """Load a program into memory."""
 
         program = []
 
-        if len(sys.argv) != 2:
-            print('must have filename')
-            sys.exit(1)
-
         try:
             address = 0
-            with open(sys.argv[1]) as f:
+            with open(arg[1]) as f:
                 for line in f:
+                    # split before comment
+                    # convert to a number splitting and stripping
                     num = line.split('#')[0].strip()
                     if num == '':
-                        continue
+                        continue  # ignore blank lines
 
                     # print num
                     value = int(num, 2)  # ,2
                     program.append(value)
 
         except FileNotFoundError:
-            print(f'{sys.argv[0]}: {sys.argv[1]} not found')
+            print(f'{arg[0]}: {arg[1]} not found')
             sys.exit(2)
 
+        # store val in memory at the given address
         for instruction in program:
             self.ram[address] = instruction
             address += 1
@@ -95,22 +115,26 @@ class CPU:
             if cmd == HLT:
                 running = False
 
-            elif cmd == LDI:
-                self.reg[operand_a] = operand_b
-                self.pc += 3
+            # elif cmd == LDI:
+            #     self.reg[operand_a] = operand_b
+            #     self.pc += 3
 
-            elif cmd == PRN:
-                print(self.reg[operand_a])
-                self.pc += 2
+            # elif cmd == PRN:
+            #     print(self.reg[operand_a])
+            #     self.pc += 2
 
-            elif cmd == MUL:
-                # MULVAL = self.alu(
-                #     self, self.reg[operand_a], self.reg[operand_b])
-                # print('multiplied value ==>', MULVAL)
-                # self.pc += 3
-                self.alu('MUL', operand_a, operand_b)
-                self.pc += 3
+            # elif cmd == MUL:
+            #     # MULVAL = self.alu(
+            #     #     self, self.reg[operand_a], self.reg[operand_b])
+            #     # print('multiplied value ==>', MULVAL)
+            #     # self.pc += 3
+            #     self.alu('MUL', operand_a, operand_b)
+            #     self.pc += 3
 
             else:
-                print('unknown instruction')
-                sys.exit(1)
+                elif IR not in self.branchtable:
+                    print('unknown instruction')
+                    sys.exit(1)
+
+                else:
+                    self.branchtable[cmd](operand_a, operand_b)
