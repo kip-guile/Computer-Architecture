@@ -3,9 +3,6 @@
 import sys
 
 HLT = 0b00000001
-LDI = 0b10000010
-PRN = 0b01000111
-MUL = 0b10100010
 
 
 class CPU:
@@ -19,7 +16,10 @@ class CPU:
 
         self.branchtable = {}
         self.branch_operations()
+        # initialize stack pointer
+        self.stack_pointer = 0xF3
 
+    # Branch ops
     def LDI(self, a, b):
         self.reg[a] = b
         self.pc += 3
@@ -32,11 +32,33 @@ class CPU:
         print(self.reg[a])
         self.pc += 2
 
+    # Stack ops
+    def POP(self, a, b):
+        stack_value = self.ram[self.stack_pointer]
+        self.reg[a] = stack_value
+        # increase pointer once we get to 0xFF because we cant reach top of stack
+        if self.stack_pointer != 0xFF:
+            self.stack_pointer += 1
+        self.pc += 2
+
+    def PUSH(self, a, b):
+        # move stack pointer down
+        self.stack_pointer -= 1
+        # get value from register
+        val = self.reg[a]
+        # insert value onto stack
+        self.ram_write(self.stack_pointer, val)
+        self.pc += 2
+
+    # populate branchtable
     def branch_operations(self):
         self.branchtable[0b10000010] = self.LDI
         self.branchtable[0b01000111] = self.PRN
         self.branchtable[0b10100010] = self.MUL
+        self.branchtable[0b01000110] = self.POP
+        self.branchtable[0b01000101] = self.PUSH
 
+    # returns value at the address in memory
     def ram_read(self, address):
         return self.ram[address]
 
@@ -105,11 +127,13 @@ class CPU:
         """Run the CPU."""
         running = True
         while running:
+            # store address of data
             cmd = self.ram_read(self.pc)
 
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
 
+            # halt cpu and exit emulator
             if cmd == HLT:
                 print('closing run loop')
                 running = False
