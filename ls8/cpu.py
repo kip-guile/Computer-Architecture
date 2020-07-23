@@ -32,6 +32,16 @@ class CPU:
         print(self.reg[a])
         self.pc += 2
 
+    def CALL(self, a, b):
+        self.stack_pointer -= 1
+        return_address = self.pc + 2
+        self.ram_write(self.stack_pointer, return_address)
+        self.pc = self.reg[a]
+
+    def RET(self, a, b):
+        stack_value = self.ram[self.stack_pointer]
+        self.pc = stack_value
+
     # Stack ops
     def POP(self, a, b):
         stack_value = self.ram[self.stack_pointer]
@@ -57,6 +67,8 @@ class CPU:
         self.branchtable[0b10100010] = self.MUL
         self.branchtable[0b01000110] = self.POP
         self.branchtable[0b01000101] = self.PUSH
+        self.branchtable[] = self.CALL
+        self.branchtable[] = self.RET
 
     # returns value at the address in memory
     def ram_read(self, address):
