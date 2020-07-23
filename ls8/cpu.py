@@ -60,15 +60,21 @@ class CPU:
         self.ram_write(self.stack_pointer, val)
         self.pc += 2
 
+    def ADD(self, op_a, op_b):
+        self.alu('ADD', op_a, op_b)
+        self.pc += 3
+
     # populate branchtable
+
     def branch_operations(self):
         self.branchtable[0b10000010] = self.LDI
         self.branchtable[0b01000111] = self.PRN
         self.branchtable[0b10100010] = self.MUL
+        self.branchtable[0b10100000] = self.ADD
         self.branchtable[0b01000110] = self.POP
         self.branchtable[0b01000101] = self.PUSH
-        self.branchtable[] = self.CALL
-        self.branchtable[] = self.RET
+        self.branchtable[0b01010000] = self.CALL
+        self.branchtable[0b00010001] = self.RET
 
     # returns value at the address in memory
     def ram_read(self, address):
