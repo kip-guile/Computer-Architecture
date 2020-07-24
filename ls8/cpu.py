@@ -16,7 +16,7 @@ class CPU:
 
         self.branchtable = {}
         self.branch_operations()
-        # initialize stack pointer
+        # initialize stack pointer that points to the top element
         self.stack_pointer = 0xF3
         self.FLG = 0b00000000
 
@@ -49,11 +49,13 @@ class CPU:
 
     # Stack ops
     def POP(self, a, b):
+        # Retrieve the value from RAM at the address stored in SP, and store that value in the register.
         stack_value = self.ram[self.stack_pointer]
         self.reg[a] = stack_value
         # increase pointer once we get to 0xFF because we cant reach top of stack
         if self.stack_pointer != 0xFF:
             self.stack_pointer += 1
+        # Increment SP
         self.pc += 2
 
     def PUSH(self, a, b):
@@ -148,9 +150,9 @@ class CPU:
             if self.reg[reg_a] > self.reg[reg_b]:
                 # modify sevent bit if a > b
                 self.FLG = 0b00000010
-            if self.reg[reg_a] < self.reg[reg_b]
-            # modify sixth bit if b < a
-            self.FLG = 0b00000100
+            if self.reg[reg_a] < self.reg[reg_b]:
+                # modify sixth bit if b < a
+                self.FLG = 0b00000100
             else:
                 # modfy 8th bit if equal
                 self.FLG = 0b00000001
