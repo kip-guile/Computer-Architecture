@@ -18,6 +18,7 @@ class CPU:
         self.branch_operations()
         # initialize stack pointer
         self.stack_pointer = 0xF3
+        self.FLG = 0b00000000
 
     # Branch ops
     def LDI(self, a, b):
@@ -26,6 +27,10 @@ class CPU:
 
     def MUL(self, a, b):
         self.alu('MUL', a, b)
+        self.pc += 3
+
+    def CMP(self, a, b):
+        self.alu('CMP', a, b)
         self.pc += 3
 
     def PRN(self, a, b):
@@ -70,6 +75,7 @@ class CPU:
         self.branchtable[0b10000010] = self.LDI
         self.branchtable[0b01000111] = self.PRN
         self.branchtable[0b10100010] = self.MUL
+        self.branchtable[0b10100111] = self.CMP
         self.branchtable[0b10100000] = self.ADD
         self.branchtable[0b01000110] = self.POP
         self.branchtable[0b01000101] = self.PUSH
@@ -118,6 +124,16 @@ class CPU:
             self.reg[reg_a] += self.reg[reg_b]
         elif op == 'MUL':
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == 'CMP':
+            if self.reg[reg_a] > self.reg[reg_b]:
+                # modify sevent bit
+                self.FLG = 0b00000010
+            if self.reg[reg_a] < self.reg[reg_b]
+            # modify sixth bit
+            self.FLG = 0b00000100
+            else:
+                # modfy 8th bit
+                self.FLG = 0b00000001
         else:
             raise Exception("Unsupported ALU operation")
 
