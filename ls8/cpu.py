@@ -73,6 +73,12 @@ class CPU:
         # Set the `PC` to the address stored in the given register.
         self.pc = self.reg[a]
 
+    def JEQ(self, a, b):
+        if self.FLG == 0b00000001:
+            self.pc = self.reg[a]
+        else:
+            self.pc += 2
+
     # populate branchtable
 
     def branch_operations(self):
@@ -130,13 +136,13 @@ class CPU:
             self.reg[reg_a] *= self.reg[reg_b]
         elif op == 'CMP':
             if self.reg[reg_a] > self.reg[reg_b]:
-                # modify sevent bit
+                # modify sevent bit if a > b
                 self.FLG = 0b00000010
             if self.reg[reg_a] < self.reg[reg_b]
-            # modify sixth bit
+            # modify sixth bit if b < a
             self.FLG = 0b00000100
             else:
-                # modfy 8th bit
+                # modfy 8th bit if equal
                 self.FLG = 0b00000001
         else:
             raise Exception("Unsupported ALU operation")
