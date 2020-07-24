@@ -79,6 +79,13 @@ class CPU:
         else:
             self.pc += 2
 
+    def JNE(self, a, b):
+        # If `E` flag is clear (false, 0), jump to the address stored in the given register.
+        if self.FLG != 0b00000001:
+            self.pc = self.reg[a]
+        else:
+            self.pc += 2
+
     # populate branchtable
 
     def branch_operations(self):
@@ -86,6 +93,9 @@ class CPU:
         self.branchtable[0b01000111] = self.PRN
         self.branchtable[0b10100010] = self.MUL
         self.branchtable[0b10100111] = self.CMP
+        self.branchtable[0b01010100] = self.JMP
+        self.branchtable[0b01010101] = self.JEQ
+        self.branchtable[0b01010110] = self.JNE
         self.branchtable[0b10100000] = self.ADD
         self.branchtable[0b01000110] = self.POP
         self.branchtable[0b01000101] = self.PUSH
