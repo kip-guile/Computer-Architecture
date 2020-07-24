@@ -69,6 +69,10 @@ class CPU:
         self.alu('ADD', op_a, op_b)
         self.pc += 3
 
+    def JMP(self, a, b):
+        # Set the `PC` to the address stored in the given register.
+        self.pc = self.reg[a]
+
     # populate branchtable
 
     def branch_operations(self):
